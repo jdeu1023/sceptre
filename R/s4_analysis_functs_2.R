@@ -330,6 +330,7 @@ run_sceptre_analysis_high_level <- function(sceptre_object, response_grna_group_
     control_group_complement = sceptre_object@control_group_complement,
     n_nonzero_trt_thresh = sceptre_object@n_nonzero_trt_thresh,
     n_nonzero_cntrl_thresh = sceptre_object@n_nonzero_cntrl_thresh,
+    n_nonzero_thresh = sceptre_object@n_nonzero_thresh,
     side_code = sceptre_object@side_code, low_moi = sceptre_object@low_moi,
     response_precomputations = sceptre_object@response_precomputations,
     cells_in_use = sceptre_object@cells_in_use, print_progress = print_progress,
