@@ -10,19 +10,23 @@
 #' @return a list containing the following elements: (i) "fitted_coefs": a vector of fitted coefficients; (ii) "theta": the fitted theta.
 #' @noRd
 perform_response_precomputation <- function(expressions, covariate_matrix) {
-  pois_fit <- stats::glm.fit(y = expressions, x = covariate_matrix, family = stats::poisson())
+  gp_fit <- glmGamPoi::glm_gp(data = matrix(expressions, nrow = 1), design = covariate_matrix, size_factors = FALSE,
+                               overdispersion = FALSE, overdispersion_shrinkage = FALSE, do_cox_reid_adjustment = FALSE)
+  fitted_coefs <- gp_fit$Beta[1, ]
+  fitted_values <- as.vector(gp_fit$Mu)
+  dfr <- length(expressions) - ncol(covariate_matrix)
   response_theta_list <- estimate_theta(
-    y = expressions, mu = pois_fit$fitted.values, dfr = pois_fit$df.residual,
+    y = expressions, mu = fitted_values, dfr = dfr,
     limit = 50, eps = (.Machine$double.eps)^(1 / 4)
   )
   # check that NAs are absent from the fitted coefficient vector
-  if (any(is.na(pois_fit$coefficients))) {
-    problem_covariates <- paste0(names(which(is.na(pois_fit$coefficients))))
+  if (any(is.na(fitted_coefs))) {
+    problem_covariates <- paste0(names(which(is.na(fitted_coefs))))
     stop("The coefficients corresponding to the following covariates cannot be estimated in the regression model: ",
          paste0(problem_covariates, collapse = ", "), ". Consider removing these covariates from the model (by updating `formula_object` in `set_analysis_parameters()`).")
   }
   theta <- max(min(response_theta_list[[1]], 1000), 0.01)
-  result <- list(fitted_coefs = pois_fit$coefficients, theta = theta)
+  result <- list(fitted_coefs = fitted_coefs, theta = theta)
   return(result)
 }
 
