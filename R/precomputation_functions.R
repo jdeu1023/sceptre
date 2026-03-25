@@ -9,12 +9,18 @@
 #'
 #' @return a list containing the following elements: (i) "fitted_coefs": a vector of fitted coefficients; (ii) "theta": the fitted theta.
 #' @noRd
-perform_response_precomputation <- function(expressions, covariate_matrix, n_nonzero_thresh = Inf) {
-  if (sum(expressions != 0L) < n_nonzero_thresh) {
+perform_response_precomputation <- function(expressions, covariate_matrix, use_gampoi_below_this = 0) {
+  if (sum(expressions != 0L) < use_gampoi_below_this) {
     gp_fit <- glmGamPoi::glm_gp(data = matrix(expressions, nrow = 1), design = covariate_matrix, size_factors = FALSE,
                                  overdispersion = FALSE, overdispersion_shrinkage = FALSE, do_cox_reid_adjustment = FALSE)
     fitted_coefs <- gp_fit$Beta[1, ]
     fitted_values <- as.vector(gp_fit$Mu)
+    if (!all(is.finite(fitted_coefs)) || !all(is.finite(fitted_values))) {
+      message("glmGamPoi produced non-finite output; falling back to stats::glm.fit")
+      glm_fit <- stats::glm.fit(y = expressions, x = covariate_matrix, family = stats::poisson())
+      fitted_coefs <- glm_fit$coefficients
+      fitted_values <- glm_fit$fitted.values
+    }
   } else {
     glm_fit <- stats::glm.fit(y = expressions, x = covariate_matrix, family = stats::poisson())
     fitted_coefs <- glm_fit$coefficients

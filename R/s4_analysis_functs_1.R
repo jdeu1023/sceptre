@@ -317,7 +317,7 @@ run_qc_pt_1 <- function(sceptre_object,
   # 4. update uncached fields of the sceptre object
   sceptre_object@n_nonzero_trt_thresh <- as.integer(n_nonzero_trt_thresh)
   sceptre_object@n_nonzero_cntrl_thresh <- as.integer(n_nonzero_cntrl_thresh)
-  sceptre_object@n_nonzero_thresh <- Inf
+  sceptre_object@use_gampoi_below_this <- 0
 
   # 5. determine the cells to retain after cellwise qc
   sceptre_object <- determine_cells_to_retain(

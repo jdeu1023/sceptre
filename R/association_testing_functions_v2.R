@@ -59,7 +59,7 @@ perm_test_glm_factored_out <- function(synthetic_idxs, B1, B2, B3, fit_parametri
 # workhorse function 2: permutations, glm run inside
 discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_parametric_curve, output_amount, covariate_matrix,
                                         all_nt_idxs, grna_group_idxs, grna_groups, expression_vector, side_code,
-                                        n_nonzero_thresh = Inf) {
+                                        use_gampoi_below_this = 0) {
   result_list_inner <- vector(mode = "list", length = length(grna_groups))
   for (i in seq_along(grna_groups)) {
     curr_grna_group <- grna_groups[i]
@@ -76,7 +76,7 @@ discovery_ntcells_perm_test <- function(synthetic_idxs, B1, B2, B3, fit_parametr
     response_precomp <- perform_response_precomputation(
       expressions = curr_expression_vector,
       covariate_matrix = curr_covariate_matrix,
-      n_nonzero_thresh = n_nonzero_thresh
+      use_gampoi_below_this = use_gampoi_below_this
     )
     # 3. get the precomp pieces
     precomp_pieces <- compute_precomputation_pieces(
@@ -168,7 +168,7 @@ crt_glm_factored_out <- function(B1, B2, B3, fit_parametric_curve, output_amount
 # workhorse function 4: crt, glm run inside
 discovery_ntcells_crt <- function(B1, B2, B3, fit_parametric_curve, output_amount, get_idx_f, response_ids,
                                   covariate_matrix, curr_grna_group, all_nt_idxs, response_matrix,
-                                  side_code, cells_in_use, n_nonzero_thresh = Inf) {
+                                  side_code, cells_in_use, use_gampoi_below_this = 0) {
   result_list_inner <- vector(mode = "list", length = length(response_ids))
   # initialize the idxs
   idxs <- get_idx_f(curr_grna_group)
@@ -200,7 +200,7 @@ discovery_ntcells_crt <- function(B1, B2, B3, fit_parametric_curve, output_amoun
     response_precomp <- perform_response_precomputation(
       expressions = curr_expression_vector,
       covariate_matrix = curr_covariate_matrix,
-      n_nonzero_thresh = n_nonzero_thresh
+      use_gampoi_below_this = use_gampoi_below_this
     )
     # get the precomp pieces
     pieces_precomp <- compute_precomputation_pieces(
